@@ -1,10 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './App.css';
 import CryptoList from './components/CryptoList';
+import Portfolio from './components/Portfolio';
 import { CryptoAsset } from './types';
 
 function App() {
+  const [selectedCrypto, setSelectedCrypto] = useState<CryptoAsset | null>(null);
+  const [activeTab, setActiveTab] = useState<'portfolio' | 'market'>('portfolio');
+
   const handleSelectCrypto = (crypto: CryptoAsset) => {
+    setSelectedCrypto(crypto);
     console.log('Selected crypto:', crypto);
   };
 
@@ -20,15 +25,34 @@ function App() {
           </p>
         </header>
 
-        <main className="space-y-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold mb-4">Portfolio Overview</h2>
-            <p className="text-gray-600">
-              Welcome to CryptoFolio! Start by selecting a cryptocurrency to add to your portfolio.
-            </p>
+        <nav className="flex justify-center mb-8">
+          <div className="flex bg-white rounded-lg shadow-md overflow-hidden">
+            <button
+              onClick={() => setActiveTab('portfolio')}
+              className={`px-6 py-3 font-medium ${
+                activeTab === 'portfolio'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Portfolio
+            </button>
+            <button
+              onClick={() => setActiveTab('market')}
+              className={`px-6 py-3 font-medium ${
+                activeTab === 'market'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              Market
+            </button>
           </div>
+        </nav>
 
-          <CryptoList onSelectCrypto={handleSelectCrypto} />
+        <main className="space-y-8">
+          {activeTab === 'portfolio' && <Portfolio />}
+          {activeTab === 'market' && <CryptoList onSelectCrypto={handleSelectCrypto} />}
         </main>
       </div>
     </div>
