@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PortfolioAsset, CryptoAsset } from '../types';
 
 interface PortfolioProps {
+  selectedCrypto?: CryptoAsset | null;
   onAddAsset?: (crypto: CryptoAsset, amount: number) => void;
 }
 
-const Portfolio: React.FC<PortfolioProps> = ({ onAddAsset }) => {
+const Portfolio: React.FC<PortfolioProps> = ({ selectedCrypto, onAddAsset }) => {
   const [portfolioAssets, setPortfolioAssets] = useState<PortfolioAsset[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedCrypto, setSelectedCrypto] = useState<CryptoAsset | null>(null);
   const [amount, setAmount] = useState<string>('');
 
   const totalValue = portfolioAssets.reduce((sum, asset) => sum + asset.value, 0);
+
+  useEffect(() => {
+    if (selectedCrypto) {
+      setShowAddModal(true);
+    }
+  }, [selectedCrypto]);
 
   const handleAddAsset = () => {
     if (selectedCrypto && amount) {
@@ -27,7 +33,6 @@ const Portfolio: React.FC<PortfolioProps> = ({ onAddAsset }) => {
       setPortfolioAssets([...portfolioAssets, newAsset]);
       setShowAddModal(false);
       setAmount('');
-      setSelectedCrypto(null);
     }
   };
 
@@ -114,36 +119,54 @@ const Portfolio: React.FC<PortfolioProps> = ({ onAddAsset }) => {
         </div>
       )}
 
-      {showAddModal && (
+      {showAddModal && selectedCrypto && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-medium mb-4">Add Asset to Portfolio</h3>
             <div className="space-y-4">
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <img
+                  src={selectedCrypto.image}
+                  alt={selectedCrypto.name}
+                  className="h-10 w-10 rounded-full"
+                />
+                <div>
+                  <div className="font-medium text-gray-900">{selectedCrypto.name}</div>
+                  <div className="text-sm text-gray-500">
+                    ${selectedCrypto.current_price.toLocaleString()}
+                  </div>
+                </div>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Amount
                 </label>
                 <input
                   type="number"
+                  step="any"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Enter amount"
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+                {amount && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    Total value: ${(parseFloat(amount) * selectedCrypto.current_price).toLocaleString()}
+                  </div>
+                )}
               </div>
               <div className="flex space-x-3">
                 <button
                   onClick={handleAddAsset}
-                  disabled={!amount}
+                  disabled={!amount || parseFloat(amount) <= 0}
                   className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
-                  Add
+                  Add to Portfolio
                 </button>
                 <button
                   onClick={() => {
                     setShowAddModal(false);
                     setAmount('');
-                    setSelectedCrypto(null);
                   }}
                   className="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400"
                 >

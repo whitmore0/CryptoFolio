@@ -49,6 +49,7 @@ const CryptoList: React.FC<CryptoListProps> = ({ onSelectCrypto }) => {
     <div className="bg-white rounded-lg shadow overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
         <h3 className="text-lg font-medium text-gray-900">Top Cryptocurrencies</h3>
+        <p className="text-sm text-gray-600 mt-1">Click on any cryptocurrency to add it to your portfolio</p>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
@@ -72,8 +73,9 @@ const CryptoList: React.FC<CryptoListProps> = ({ onSelectCrypto }) => {
             {cryptos.map((crypto) => (
               <tr
                 key={crypto.id}
-                className="hover:bg-gray-50 cursor-pointer"
+                className="hover:bg-blue-50 cursor-pointer transition-colors"
                 onClick={() => onSelectCrypto?.(crypto)}
+                title="Click to add to portfolio"
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">

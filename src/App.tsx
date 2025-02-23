@@ -10,7 +10,7 @@ function App() {
 
   const handleSelectCrypto = (crypto: CryptoAsset) => {
     setSelectedCrypto(crypto);
-    console.log('Selected crypto:', crypto);
+    setActiveTab('portfolio');
   };
 
   return (
@@ -51,7 +51,7 @@ function App() {
         </nav>
 
         <main className="space-y-8">
-          {activeTab === 'portfolio' && <Portfolio />}
+          {activeTab === 'portfolio' && <Portfolio selectedCrypto={selectedCrypto} />}
           {activeTab === 'market' && <CryptoList onSelectCrypto={handleSelectCrypto} />}
         </main>
       </div>
