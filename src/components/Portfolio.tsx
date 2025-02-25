@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PortfolioAsset, CryptoAsset } from '../types';
+import { localStorageUtils } from '../utils/localStorage';
 
 interface PortfolioProps {
   selectedCrypto?: CryptoAsset | null;
@@ -12,6 +13,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ selectedCrypto, onAddAsset }) => 
   const [amount, setAmount] = useState<string>('');
 
   const totalValue = portfolioAssets.reduce((sum, asset) => sum + asset.value, 0);
+
+  useEffect(() => {
+    const savedPortfolio = localStorageUtils.loadPortfolio();
+    setPortfolioAssets(savedPortfolio);
+  }, []);
+
+  useEffect(() => {
+    localStorageUtils.savePortfolio(portfolioAssets);
+  }, [portfolioAssets]);
 
   useEffect(() => {
     if (selectedCrypto) {
@@ -41,6 +51,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ selectedCrypto, onAddAsset }) => 
     setPortfolioAssets(updated);
   };
 
+  const clearPortfolio = () => {
+    if (window.confirm('Are you sure you want to clear your entire portfolio?')) {
+      setPortfolioAssets([]);
+      localStorageUtils.clearPortfolio();
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow">
       <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -50,12 +67,22 @@ const Portfolio: React.FC<PortfolioProps> = ({ selectedCrypto, onAddAsset }) => 
             Total Value: <span className="font-semibold text-green-600">${totalValue.toLocaleString()}</span>
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-        >
-          Add Asset
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Add Asset
+          </button>
+          {portfolioAssets.length > 0 && (
+            <button
+              onClick={clearPortfolio}
+              className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
       </div>
 
       {portfolioAssets.length === 0 ? (
